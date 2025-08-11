@@ -1,0 +1,24 @@
+.main__page {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 1360px;
+}
+.cards {
+  width: 100%;
+}
+.cards__text {
+  margin: 0;
+  padding: 0 0 34px;
+  height: 25px;
+  font-family: Cabinet Grotesk;
+  font-weight: 700;
+  font-size: 20px;
+}
+.cards__list {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 0 0 85px;
+  margin: 0;
+  list-style-type: none;
+  gap: 20px;
+}

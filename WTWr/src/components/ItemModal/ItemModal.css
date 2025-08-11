@@ -1,0 +1,24 @@
+.modal__content.modal__content_type_image {
+  padding: 0;
+  margin: 0;
+  width: 498px;
+  height: 610px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.modal__close.modal__content_type_image {
+  background-image: url("../../Plugin/close-icon.png");
+}
+.modal__image {
+  object-fit: cover;
+}
+.modal__footer {
+  padding: 20px 32px 32px;
+}
+.modal__caption {
+  margin: 0;
+  padding: 0 0 12px;
+}
+.modal__weather {
+  margin: 0;
+}

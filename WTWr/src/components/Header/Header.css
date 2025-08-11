@@ -1,0 +1,51 @@
+.header {
+  display: flex;
+
+  height: 40px;
+  align-items: center;
+  gap: 4px;
+  padding: 32px 0 28px;
+  top: 32px;
+  left: 40px;
+  font-size: 20px;
+  font-family: Cabinet Grotesk;
+}
+.header__logo {
+  margin-right: 24px;
+  width: 89px;
+  height: 40px;
+}
+.header__date-and-location {
+  margin: 0;
+  height: 24px;
+  top: 24px;
+  right: 1086;
+}
+.header__add-clothes-btn {
+  height: 24px;
+  top: 8px;
+  left: 10px;
+  margin: 0 20px 0 auto;
+  border: 0;
+  background-color: transparent;
+  font-family: cabinet grotesk;
+  font-size: 20px;
+  line-height: 24px;
+}
+
+.header__user-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  height: 25px;
+  top: 8px;
+  left: 1151px;
+}
+.header__username {
+  margin: 0;
+}
+.header__avatar {
+  width: 40px;
+  height: 40px;
+}
