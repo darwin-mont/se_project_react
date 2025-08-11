@@ -1,3 +1,11 @@
+/* @font-face {
+  src: url("../../vendor/font/CabinetGrotesk-Light.woff") format("woff");
+  font-family: "Cabinet Grotesk";
+} */
+@font-face {
+  src: url("../../vendor/font/CabinetGrotesk-Bold.woff") format("woff");
+  font-family: "Cabinet Grotesk-Bold";
+}
 .main__page {
   display: flex;
   flex-wrap: wrap;
@@ -10,7 +18,8 @@
   margin: 0;
   padding: 0 0 34px;
   height: 25px;
-  font-family: Cabinet Grotesk;
+  font-family: Cabinet Grotesk, sans-serif;
+  font-style: bold;
   font-weight: 700;
   font-size: 20px;
 }

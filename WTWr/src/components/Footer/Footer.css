@@ -1,4 +1,6 @@
 .footer {
+  font-family: Cabinet Grotesk, sans-serif;
+
   display: flex;
   justify-content: space-between;
   margin: 0;
