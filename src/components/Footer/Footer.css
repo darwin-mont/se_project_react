@@ -1,10 +1,9 @@
 .footer {
-  font-family: Cabinet Grotesk, sans-serif;
-
   display: flex;
   justify-content: space-between;
   margin: 0;
   padding: 0;
+  font-family: Cabinet Grotesk, sans-serif;
 }
 .footer__author {
   margin: 0;
