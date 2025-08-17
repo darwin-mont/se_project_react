@@ -10,6 +10,9 @@ import ItemModal from "../ItemModal/ItemModal";
 import { getWeather, filterWeatherData } from "../../utils/weatherApi";
 
 function App() {
+  // State to hold clothing items and weather data
+  const [clothingItems, setClothingItems] = useState(defaultClothingItems);
+
   const [weatherData, setWeatherData] = useState({
     type: "",
     temp: { F: 99, C: 99 },
@@ -40,8 +43,6 @@ function App() {
         console.error("Failed to fetch weather data:", error);
       });
   }, []);
-
-  const [clothingItems, setClothingItems] = useState(defaultClothingItems);
 
   return (
     <div className="page">
