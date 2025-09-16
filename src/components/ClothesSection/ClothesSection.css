@@ -1,0 +1,24 @@
+.clothes-section {
+}
+.clothes-section__title {
+  padding: 0%;
+  margin: 0%;
+}
+
+.clothes-section__description {
+  font-size: 16px;
+  color: #666;
+}
+.clothes-section__list {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 0;
+}
+
+.clothes-section__header {
+  gap: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
