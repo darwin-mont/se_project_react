@@ -8,9 +8,13 @@ export default function ToggleSwitch() {
   );
 
   return (
-    <label className="toggle-switch">
+    <label className="toggle-switch" htmlFor="temp-toggle">
       <input
+        id="temp-toggle"
+        name="temp-toggle"
         type="checkbox"
+        // prevent browser autofill from mis-targeting this control
+        autoComplete="off"
         className="toggle-switch__checkbox"
         checked={currentTemperatureUnit === "C"}
         onChange={handleToggleSwitchChange}

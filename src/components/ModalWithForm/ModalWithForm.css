@@ -47,16 +47,87 @@
   gap: 24px;
 }
 .modal__label {
-  border: 1px;
-  padding: 0 0 8px;
+  display: block;
+  padding: 0 0 4px;
+  margin-bottom: 6px;
+  position: relative; /* contain absolutely-positioned error */
 }
 
 .modal__input {
   display: block;
-  padding: 8px 0;
+  /* tightened vertical padding so text sits closer to the underline */
+  padding: 6px 0 6px;
   width: 100%;
   border: none;
   border-bottom: 1px solid #000;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.modal__input_invalid {
+  border-bottom-color: #e74c3c; /* red */
+  outline: none;
+}
+
+.modal__error {
+  /* position absolutely so showing the error doesn't push layout */
+  position: absolute;
+  left: 0;
+  bottom: -18px;
+  margin: 0;
+  font-size: 12px;
+  color: #e74c3c;
+  line-height: 1.2;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 120ms ease-in-out, visibility 120ms ease-in-out;
+  pointer-events: none;
+  width: 100%;
+}
+
+.modal__error_visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal__radio-btns label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.modal__radio-btns_invalid {
+  outline: 2px solid rgba(231, 76, 60, 0.12);
+  border-radius: 6px;
+  padding: 8px;
+}
+
+.modal__radio-btns_invalid .modal__legend {
+  color: #e74c3c;
+}
+
+.modal__radio-btns_invalid .modal__radio-input {
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.06);
+}
+
+.modal__radio-input {
+  margin: 0;
+}
+
+.modal__radio-btns {
+  display: flex;
+  flex-direction: column;
+  border: 0;
+  padding: 0;
+  position: relative; /* contain absolutely-positioned radio-group error */
+}
+
+.modal__radio-btns .modal__error {
+  position: absolute;
+  left: 0;
+  bottom: -22px;
+  margin: 0;
+  width: 100%;
 }
 .modal__legend {
   margin: 0;
@@ -74,16 +145,30 @@
 
 .modal__submit {
   display: flex;
-
   width: 124px;
   height: 36px;
   align-content: center;
   justify-content: center;
   border: none;
-  background-color: #00000030;
+  background-color: #000; /* default black */
   color: #fff;
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
+  transition: background-color 120ms ease, transform 80ms ease;
+}
+
+.modal__submit:hover {
+  background-color: #666; /* hover -> grey */
+}
+
+.modal__submit:active {
+  background-color: #444; /* pressed -> darker grey */
+  transform: translateY(1px);
+}
+
+.modal__submit:focus-visible {
+  outline: 2px solid #222;
+  outline-offset: 2px;
 }

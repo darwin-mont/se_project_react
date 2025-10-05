@@ -1,6 +1,4 @@
-import { use } from "react";
 import { useState } from "react";
-import React from "react";
 
 export function useForm(defaultValues) {
   const [values, setValues] = useState(defaultValues);
@@ -8,7 +6,7 @@ export function useForm(defaultValues) {
   function handleChange(evt) {
     const { name, value } = evt.target;
     setValues({ ...values, [name]: value });
-    console.log(values);
+    // console.log(values);
   }
   return { values, setValues, handleChange };
 }
