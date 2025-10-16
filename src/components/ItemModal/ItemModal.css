@@ -22,3 +22,125 @@
 .modal__weather {
   margin: 0;
 }
+
+.modal__top-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+}
+.modal__delete-button {
+  background: transparent;
+  color: #d9534f; /* red text */
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.modal__confirm-delete {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.modal__confirm-actions button {
+  margin-left: 8px;
+}
+.modal__confirm-yes {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.modal__confirm-no {
+  background: #e0e0e0;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal__caption-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal__caption-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal__delete-button {
+  background: transparent;
+  color: #d9534f; /* red text */
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Top-right delete button overlay */
+
+/* footer caption actions already styled above */
+
+/* custom confirm modal styles */
+.confirm-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.confirm-modal {
+  background: #fff;
+  padding: 20px 22px;
+  border-radius: 10px;
+  width: 320px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+.confirm-modal h3 {
+  margin: 0 0 8px 0;
+}
+.confirm-modal p {
+  margin: 0 0 12px 0;
+}
+
+/* center content and stack buttons vertically */
+.confirm-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+.modal__confirm-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  align-items: center;
+}
+.modal__confirm-actions .modal__confirm-yes,
+.modal__confirm-actions .modal__confirm-no {
+  width: 100%;
+  max-width: 220px;
+}
+.modal__confirm-yes {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.modal__confirm-no {
+  background: #f0f0f0;
+  color: #333;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}

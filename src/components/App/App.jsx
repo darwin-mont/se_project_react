@@ -11,7 +11,7 @@ import ItemCard from "../ItemCard/ItemCard";
 import Profile from "../../components/Profile/Profile";
 import { getWeather, filterWeatherData } from "../../utils/weatherApi";
 import CurrentTemperatureUnitContext from "../../contexts/CurrentTemperatureUnitContext";
-import { getItems } from "../../utils/api";
+import { getItems, addItem, deleteItem } from "../../utils/api";
 
 function App() {
   // State to hold clothing items and weather data
@@ -46,7 +46,7 @@ function App() {
   const onAddItem = (inputValues) => {
     const newCardData = {
       name: inputValues.name,
-      link: inputValues.link,
+      imageUrl: inputValues.link,
       weather: inputValues.weatherType,
     };
     setClothingItems([...clothingItems, newCardData]);
@@ -57,132 +57,136 @@ function App() {
     setActiveModal("");
   };
 
+  // Delete handler: confirms and deletes a card. If the card has an _id, call API; always remove from local state.
+  const handleDeleteCard = (card) => {
+    if (!card) return;
+    // If card has an _id, attempt to delete from backend
+    if (card._id !== undefined && card._id !== null) {
+      deleteItem(card._id)
+        .then(() => {
+          setClothingItems((prev) => prev.filter((c) => c._id !== card._id));
+        })
+        .catch((err) => {
+          console.error("Failed to delete item:", err);
+        })
+        .finally(() => {
+          closeActiveModal();
+        });
+    } else {
+      // Local-only card (not persisted) — remove by matching unique combination
+      setClothingItems((prev) =>
+        prev.filter(
+          (c) =>
+            !(
+              c.name === card.name &&
+              (c.imageUrl || c.link) === (card.imageUrl || card.link)
+            )
+        )
+      );
+      closeActiveModal();
+    }
+  };
+
   useEffect(() => {
-    // Try to get the user's location via the browser geolocation API.
-    // If successful, fetch weather for the user's coords. If not, fall back to default coordinates.
+    // Simplified, easier-to-read geolocation logic using async/await.
     let didCancel = false;
 
-    function fetchForCoords(coords) {
-      getWeather(coords, APIkey)
-        .then((data) => {
-          if (didCancel) return;
-          const filteredData = filterWeatherData(data);
-          setWeatherData(filteredData);
-          // successful fetch for real coords resets geolocation error state
-          setGeoError(null);
-          setUsingFallback(false);
-        })
-        .catch((error) => {
-          if (didCancel) return;
-          console.error("Failed to fetch weather data:", error);
-          setGeoError("Weather fetch failed");
-          setUsingFallback(true);
-        });
-    }
-
-    if (navigator && navigator.geolocation) {
-      const tryGetPosition = (opts) =>
-        new Promise((resolve, reject) =>
-          navigator.geolocation.getCurrentPosition(resolve, reject, opts)
-        );
-
-      const opts = { enableHighAccuracy: false, timeout: 10000 };
-
-      // If Permissions API is available, check the state first to avoid unnecessary prompt
-      const handleFallback = (reason) => {
-        const msg = reason && (reason.message || reason);
-        console.warn(
-          "Geolocation failed or was denied, using fallback coordinates:",
-          msg
-        );
-        setGeoError(msg || "Geolocation failed or denied");
+    const fetchForCoords = async (coords) => {
+      try {
+        const data = await getWeather(coords, APIkey);
+        if (didCancel) return;
+        const filteredData = filterWeatherData(data);
+        setWeatherData(filteredData);
+        setGeoError(null);
+        setUsingFallback(false);
+      } catch (error) {
+        if (didCancel) return;
+        console.error("Failed to fetch weather data:", error);
+        setGeoError("Weather fetch failed");
         setUsingFallback(true);
-        fetchForCoords(coordinates);
-      };
-
-      if (navigator.permissions && navigator.permissions.query) {
-        navigator.permissions
-          .query({ name: "geolocation" })
-          .then((status) => {
-            if (status.state === "denied") {
-              // user already denied — don't trigger prompt
-              handleFallback("permission denied");
-              return;
-            }
-
-            // state is 'granted' or 'prompt' — try to get position
-            tryGetPosition(opts)
-              .then((position) => {
-                const userCoords = {
-                  latitude: position.coords.latitude,
-                  longitude: position.coords.longitude,
-                };
-                fetchForCoords(userCoords);
-              })
-              .catch((err) => {
-                // If timed out or other error, try once more with a longer timeout
-                if (err && err.code === 3) {
-                  // timeout code
-                  tryGetPosition({ ...opts, timeout: 15000 })
-                    .then((position) => {
-                      const userCoords = {
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                      };
-                      fetchForCoords(userCoords);
-                    })
-                    .catch(handleFallback);
-                } else {
-                  handleFallback(err);
-                }
-              });
-          })
-          .catch(() => {
-            // If Permissions API fails, fall back to attempting geolocation directly
-            tryGetPosition(opts)
-              .then((position) => {
-                const userCoords = {
-                  latitude: position.coords.latitude,
-                  longitude: position.coords.longitude,
-                };
-                fetchForCoords(userCoords);
-              })
-              .catch((err) => {
-                // final fallback
-                handleFallback(err);
-              });
-          });
-      } else {
-        // No Permissions API — just attempt geolocation and fallback on error
-        tryGetPosition(opts)
-          .then((position) => {
-            const userCoords = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            };
-            fetchForCoords(userCoords);
-          })
-          .catch((err) => {
-            // If timed out, one retry with longer timeout
-            if (err && err.code === 3) {
-              tryGetPosition({ ...opts, timeout: 15000 })
-                .then((position) => {
-                  const userCoords = {
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                  };
-                  fetchForCoords(userCoords);
-                })
-                .catch((e) => fetchForCoords(coordinates));
-            } else {
-              fetchForCoords(coordinates);
-            }
-          });
       }
-    } else {
-      // No geolocation support — use fallback coordinates
-      fetchForCoords(coordinates);
-    }
+    };
+
+    const getPosition = (opts = {}) =>
+      new Promise((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, reject, opts)
+      );
+
+    const run = async () => {
+      try {
+        if (navigator && navigator.geolocation) {
+          // If Permissions API is present, check first to avoid unnecessary prompt
+          let permState = "prompt";
+          if (navigator.permissions && navigator.permissions.query) {
+            try {
+              const status = await navigator.permissions.query({
+                name: "geolocation",
+              });
+              permState = status && status.state ? status.state : "prompt";
+            } catch (e) {
+              permState = "prompt";
+            }
+          }
+
+          if (permState === "denied") {
+            setGeoError("permission denied");
+            setUsingFallback(true);
+            await fetchForCoords(coordinates);
+            return;
+          }
+
+          // Attempt to get position with a reasonable timeout, retry once on timeout
+          try {
+            const pos = await getPosition({
+              enableHighAccuracy: false,
+              timeout: 10000,
+            });
+            const userCoords = {
+              latitude: pos.coords.latitude,
+              longitude: pos.coords.longitude,
+            };
+            await fetchForCoords(userCoords);
+          } catch (err) {
+            if (err && err.code === 3) {
+              // timeout -> one retry
+              try {
+                const pos = await getPosition({
+                  enableHighAccuracy: false,
+                  timeout: 15000,
+                });
+                const userCoords = {
+                  latitude: pos.coords.latitude,
+                  longitude: pos.coords.longitude,
+                };
+                await fetchForCoords(userCoords);
+              } catch (e) {
+                console.warn("Geolocation retry failed:", e && e.message);
+                setGeoError(e && e.message ? e.message : "Geolocation failed");
+                setUsingFallback(true);
+                await fetchForCoords(coordinates);
+              }
+            } else {
+              console.warn("Geolocation error:", err && err.message);
+              setGeoError(
+                err && err.message ? err.message : "Geolocation failed"
+              );
+              setUsingFallback(true);
+              await fetchForCoords(coordinates);
+            }
+          }
+        } else {
+          // No geolocation support
+          await fetchForCoords(coordinates);
+        }
+      } catch (e) {
+        console.error("Unexpected error in geolocation flow:", e);
+        setGeoError("Geolocation failed");
+        setUsingFallback(true);
+        await fetchForCoords(coordinates);
+      }
+    };
+
+    run();
 
     return () => {
       didCancel = true;
@@ -296,6 +300,7 @@ function App() {
           activeModal={activeModal}
           card={selectedCard}
           onClose={closeActiveModal}
+          onDeleteCard={handleDeleteCard}
         />
       </div>
     </CurrentTemperatureUnitContext.Provider>
