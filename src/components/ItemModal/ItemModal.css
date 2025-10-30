@@ -10,6 +10,7 @@
   background-image: url("../../Plugin/close-icon.png");
 }
 .modal__image {
+  width: 100%;
   object-fit: cover;
 }
 .modal__footer {

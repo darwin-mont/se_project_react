@@ -17,8 +17,18 @@
 }
 
 .clothes-section__header {
-  gap: 20px;
   display: flex;
   flex-direction: row;
   align-items: center;
+}
+
+.clothes-section__add-clothes-btn {
+  background-color: transparent;
+  color: #00000099;
+  border: none;
+  padding: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 88px;
+  height: 25px;
 }

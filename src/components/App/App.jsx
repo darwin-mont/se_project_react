@@ -49,8 +49,19 @@ function App() {
       imageUrl: inputValues.link,
       weather: inputValues.weatherType,
     };
-    setClothingItems([...clothingItems, newCardData]);
-    closeActiveModal();
+    // Call API to add item, then update local state
+    addItem(newCardData)
+      .then((addedItem) => {
+        setClothingItems([...clothingItems, addedItem]);
+        closeActiveModal();
+      })
+      .catch((err) => {
+        console.error("Failed to add item:", err);
+      });
+
+    // Optimistic update (commented out since we're now waiting for API response)
+    // setClothingItems([...clothingItems, newCardData]);
+    // closeActiveModal();
   };
 
   const closeActiveModal = () => {
@@ -68,9 +79,6 @@ function App() {
         })
         .catch((err) => {
           console.error("Failed to delete item:", err);
-        })
-        .finally(() => {
-          closeActiveModal();
         });
     } else {
       // Local-only card (not persisted) — remove by matching unique combination
@@ -83,7 +91,6 @@ function App() {
             )
         )
       );
-      closeActiveModal();
     }
   };
 
@@ -232,7 +239,9 @@ function App() {
         // console.log(data);
         setClothingItems(data);
       })
-      .catch(console.error);
+      .catch((error) => {
+        console.error("Failed to fetch clothing items:", error);
+      });
   }, []);
 
   return (

@@ -83,18 +83,6 @@
       "name": "T-Shirt",
       "weather": "hot",
       "imageUrl": "https://practicum-content.s3.us-west-1.amazonaws.com/software-engineer/wtwr-project/T-Shirt.png?etag=44ed1963c44ab19cd2f5011522c5fc09"
-    },
-    {
-      "name": "gorra ",
-      "imageUrl": "https://www.google.com/imgres?q=gorra&imgurl=https%3A%2F%2Fimages.ctfassets.net%2Fhnk2vsx53n6l%2F4GWRGXvdEujAwfZme306bs%2Fce120410b291a156b8260f738e783984%2F8d657d50649c22b8085ae799d94129cc0c807301.jpg%3Ffm%3Dwebp&imgrefurl=https%3A%2F%2Fwww.on.com%2Fes-us%2Fshop%2Fmens%2Faccessories%2Fcaps-beanies%3Fsrsltid%3DAfmBOoqAkOWJjXcUfLLTKf9gP3WorenfUDIbU3njx4gQvI9eA0MW-KeS&docid=xfMAYE4szANGvM&tbnid=qBewd8jGp0B25M&vet=12ahUKEwiD-eK10pOQAxUOv4kEHYeOJ2oQM3oECBwQAA..i&w=4000&h=4000&hcb=2&ved=2ahUKEwiD-eK10pOQAxUOv4kEHYeOJ2oQM3oECBwQAA",
-      "weather": "hot",
-      "_id": 17
-    },
-    {
-      "name": "gorra",
-      "imageUrl": "https://www.google.com/imgres?q=gorra&imgurl=https%3A%2F%2Fimages.ctfassets.net%2Fhnk2vsx53n6l%2F4GWRGXvdEujAwfZme306bs%2Fce120410b291a156b8260f738e783984%2F8d657d50649c22b8085ae799d94129cc0c807301.jpg%3Ffm%3Dwebp&imgrefurl=https%3A%2F%2Fwww.on.com%2Fes-us%2Fshop%2Fmens%2Faccessories%2Fcaps-beanies%3Fsrsltid%3DAfmBOoqAkOWJjXcUfLLTKf9gP3WorenfUDIbU3njx4gQvI9eA0MW-KeS&docid=xfMAYE4szANGvM&tbnid=qBewd8jGp0B25M&vet=12ahUKEwiD-eK10pOQAxUOv4kEHYeOJ2oQM3oECBwQAA..i&w=4000&h=4000&hcb=2&ved=2ahUKEwiD-eK10pOQAxUOv4kEHYeOJ2oQM3oECBwQAA",
-      "weather": "hot",
-      "_id": 18
     }
   ]
 }
