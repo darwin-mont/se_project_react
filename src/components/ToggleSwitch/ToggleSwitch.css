@@ -1,13 +1,14 @@
 .toggle-switch {
   width: 56px;
   height: 28px;
-  border: 2px solid black;
+  border: 2px solid #7e7e7e;
   border-radius: 20px;
   overflow: hidden;
   cursor: pointer;
   position: relative;
-  font-family: Cabinet Grotesk, sans-serif;
-  margin: 0 0 0 656px;
+  font-family:
+    Cabinet Grotesk,
+    sans-serif;
 }
 
 .toggle-switch__checkbox {
@@ -27,14 +28,14 @@
 .toggle-switch__text {
   position: absolute;
   color: white;
-  top: 2px;
+  top: 4px;
 }
 .toggle-switch__text_F {
-  left: 7px;
+  left: 9px;
 }
 
 .toggle-switch__text_C {
-  right: 7px;
+  right: 9px;
   color: black;
 }
 .toggle-switch__checkbox:checked ~ .toggle-switch__circle {

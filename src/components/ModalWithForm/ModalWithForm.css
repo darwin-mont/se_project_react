@@ -34,7 +34,7 @@
 
 .modal__content {
   width: 496px;
-  height: 436px;
+
   position: relative;
   background-color: #fff;
   box-sizing: border-box;
@@ -80,7 +80,9 @@
   line-height: 1.2;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 120ms ease-in-out, visibility 120ms ease-in-out;
+  transition:
+    opacity 120ms ease-in-out,
+    visibility 120ms ease-in-out;
   pointer-events: none;
   width: 100%;
 }
@@ -156,7 +158,10 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 16px;
-  transition: background-color 120ms ease, transform 80ms ease;
+  transition:
+    background-color 120ms ease,
+    transform 80ms ease;
+  flex-shrink: 0;
 }
 
 .modal__submit:hover {
@@ -171,4 +176,25 @@
 .modal__submit:focus-visible {
   outline: 2px solid #222;
   outline-offset: 2px;
+}
+.modal__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.modal__switch-button {
+  background: none;
+  border: none;
+  color: #222;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 8px 0;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.modal__switch-button:hover {
+  color: grey;
 }

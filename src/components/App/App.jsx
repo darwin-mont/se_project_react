@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import "./App.css";
 import { coordinates, APIkey } from "../../utils/constants";
 import Header from "../Header/Header";
@@ -9,14 +9,29 @@ import AddItemModal from "../AddItemModal/AddItemModal";
 import ItemModal from "../ItemModal/ItemModal";
 import ItemCard from "../ItemCard/ItemCard";
 import Profile from "../../components/Profile/Profile";
+import LoginModal from "../../components/LoginModal/LoginModal";
+import RegisterModal from "../../components/RegisterModal/RegisterModal";
+import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import { getWeather, filterWeatherData } from "../../utils/weatherApi";
 import CurrentTemperatureUnitContext from "../../contexts/CurrentTemperatureUnitContext";
-import { getItems, addItem, deleteItem } from "../../utils/api";
+import {
+  getItems,
+  addItem,
+  deleteItem,
+  loginUser,
+  registerUser,
+  getCurrentUser,
+  addCardLike,
+  removeCardLike,
+} from "../../utils/api";
+
+import EditProfileModal from "../EditProfileModal/EditProfileModal";
+import { updateProfile } from "../../utils/api";
 
 function App() {
+  const navigate = useNavigate();
   // State to hold clothing items and weather data
   const [clothingItems, setClothingItems] = useState([]);
-
   const [weatherData, setWeatherData] = useState({
     type: "",
     temp: { F: 99, C: 99 },
@@ -29,7 +44,39 @@ function App() {
   const [currentTemperatureUnit, setCurrentTemperatureUnit] = useState("F");
   const [geoError, setGeoError] = useState(null);
   const [usingFallback, setUsingFallback] = useState(false);
+  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
 
+  ///-------///
+
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return !!localStorage.getItem("jwt");
+  });
+
+  const [userName, setUserName] = useState(() => {
+    const savedUser = localStorage.getItem("userData");
+    if (savedUser) {
+      try {
+        return JSON.parse(savedUser).name || "";
+      } catch {
+        return "";
+      }
+    }
+    return "";
+  });
+
+  const [currentUser, setCurrentUser] = useState(() => {
+    const savedUser = localStorage.getItem("userData");
+    if (savedUser) {
+      try {
+        return JSON.parse(savedUser);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
+
+  //---------//
   const handleToggleSwitchChange = () => {
     setCurrentTemperatureUnit(currentTemperatureUnit === "F" ? "C" : "F");
   };
@@ -43,32 +90,179 @@ function App() {
     setActiveModal("add-garment");
   };
 
+  // LIKE handler
+
+  const handleCardLike = ({ id, isLiked }) => {
+    const token = localStorage.getItem("jwt");
+
+    // Safety check
+    if (!currentUser) {
+      console.error("No user logged in");
+      return;
+    }
+
+    if (!isLiked) {
+      // Add like
+      addCardLike(id, token)
+        .then((updatedCard) => {
+          if (updatedCard && updatedCard._id) {
+            setClothingItems((cards) =>
+              cards.map((item) => (item._id === id ? updatedCard : item)),
+            );
+          } else {
+            // Fallback: manually add like
+            setClothingItems((cards) =>
+              cards.map((item) => {
+                if (item._id === id) {
+                  const currentLikes = item.likes || [];
+                  if (!currentLikes.includes(currentUser._id)) {
+                    return {
+                      ...item,
+                      likes: [...currentLikes, currentUser._id],
+                    };
+                  }
+                  return item;
+                }
+                return item;
+              }),
+            );
+          }
+        })
+        .catch((err) => console.log("Error liking item", err));
+    } else {
+      // Remove like
+      removeCardLike(id, token)
+        .then((updatedCard) => {
+          if (updatedCard && updatedCard._id) {
+            setClothingItems((cards) =>
+              cards.map((item) => (item._id === id ? updatedCard : item)),
+            );
+          } else {
+            // Fallback: manually remove like
+            setClothingItems((cards) =>
+              cards.map((item) => {
+                if (item._id === id) {
+                  return {
+                    ...item,
+                    likes: (item.likes || []).filter(
+                      (userId) => userId !== currentUser._id,
+                    ),
+                  };
+                }
+                return item;
+              }),
+            );
+          }
+        })
+        .catch((err) => console.log("Error removing like", err));
+    }
+  };
+  // Auth handlers
+  const handleLoginClick = () => {
+    setActiveModal("login");
+  };
+
+  const handleRegisterClick = () => {
+    setActiveModal("register");
+  };
+
+  const handleLogin = async ({ email, password }) => {
+    try {
+      const userData = await loginUser({ email, password });
+      // userData now contains {_id, email, name, avatar}
+      setIsLoggedIn(true);
+      setUserName(userData.name || "User");
+      setCurrentUser(userData);
+      setActiveModal("");
+      localStorage.setItem("userData", JSON.stringify(userData));
+      navigate("/profile");
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert(error.message || "Login failed. Please check your credentials. ");
+    }
+  };
+
+  const handleRegister = async ({ name, email, avatarURL, password }) => {
+    try {
+      const userData = await registerUser({ name, email, avatarURL, password });
+      setIsLoggedIn(true);
+      setUserName(userData.name);
+      setCurrentUser(userData);
+      setActiveModal("");
+      localStorage.setItem("userData", JSON.stringify(userData));
+      navigate("/profile");
+    } catch (error) {
+      console.error("Registration failed:", error);
+      alert(error.message || "Registration failed. Please try again.");
+    }
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUserName("");
+    setCurrentUser(null);
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("userData");
+    setActiveModal("");
+    navigate("/");
+    console.log("user logged out"); //debugging implementation
+  };
+
+  const handleSwitchToRegister = () => {
+    setActiveModal("register");
+  };
+
+  const handleSwitchToLogin = () => {
+    setActiveModal("login");
+  };
+
+  const handleEditProfile = () => {
+    setIsEditProfileModalOpen(true);
+  };
+
   const onAddItem = (inputValues) => {
     const newCardData = {
       name: inputValues.name,
       imageUrl: inputValues.link,
       weather: inputValues.weatherType,
     };
-    // Call API to add item, then update local state
+
+    console.log("Sending to API:", newCardData);
+
     addItem(newCardData)
-      .then((addedItem) => {
-        setClothingItems([...clothingItems, addedItem]);
-        closeActiveModal();
+      .then((response) => {
+        console.log("API response:", response);
+
+        // Extract the item from response
+        let addedItem = response;
+
+        // If response has a 'data' property, use that
+        if (response && response.data) {
+          addedItem = response.data;
+        }
+
+        console.log("Extracted item:", addedItem);
+
+        // Update the state with the new item
+        setClothingItems((prevItems) => {
+          const updatedItems = [...prevItems, addedItem];
+          console.log("New items list:", updatedItems);
+          return updatedItems;
+        });
+
+        // Close the modal
+        setActiveModal(""); // Use this instead of closeActiveModal()
       })
       .catch((err) => {
         console.error("Failed to add item:", err);
+        alert("Failed to add item. Please try again.");
       });
-
-    // Optimistic update (commented out since we're now waiting for API response)
-    // setClothingItems([...clothingItems, newCardData]);
-    // closeActiveModal();
   };
 
   const closeActiveModal = () => {
     setActiveModal("");
   };
 
-  // Delete handler: confirms and deletes a card. If the card has an _id, call API; always remove from local state.
   const handleDeleteCard = (card) => {
     if (!card) return;
     // If card has an _id, attempt to delete from backend
@@ -88,14 +282,42 @@ function App() {
             !(
               c.name === card.name &&
               (c.imageUrl || c.link) === (card.imageUrl || card.link)
-            )
-        )
+            ),
+        ),
       );
     }
   };
 
+  //-----//
+
   useEffect(() => {
-    // Simplified, easier-to-read geolocation logic using async/await.
+    const checkToken = async () => {
+      const token = localStorage.getItem("jwt");
+
+      if (token) {
+        try {
+          // -- verification with backend
+          const userData = await getCurrentUser();
+          console.log("Auto-login successful:", userData);
+          setIsLoggedIn(true);
+          setUserName(userData.name || "User");
+          setCurrentUser(userData);
+          localStorage.setItem("userData", JSON.stringify(userData));
+        } catch (error) {
+          console.error("Backend verification failed:", error);
+          localStorage.removeItem("jwt");
+          localStorage.removeItem("userData");
+          setIsLoggedIn(false);
+          setUserName("");
+          setCurrentUser(null);
+        }
+      }
+    };
+
+    checkToken();
+  }, []);
+
+  useEffect(() => {
     let didCancel = false;
 
     const fetchForCoords = async (coords) => {
@@ -116,7 +338,7 @@ function App() {
 
     const getPosition = (opts = {}) =>
       new Promise((resolve, reject) =>
-        navigator.geolocation.getCurrentPosition(resolve, reject, opts)
+        navigator.geolocation.getCurrentPosition(resolve, reject, opts),
       );
 
     const run = async () => {
@@ -175,7 +397,7 @@ function App() {
             } else {
               console.warn("Geolocation error:", err && err.message);
               setGeoError(
-                err && err.message ? err.message : "Geolocation failed"
+                err && err.message ? err.message : "Geolocation failed",
               );
               setUsingFallback(true);
               await fetchForCoords(coordinates);
@@ -200,7 +422,6 @@ function App() {
     };
   }, []);
 
-  // Allow manual retry when geolocation previously failed
   function handleRetryGeolocation() {
     setGeoError(null);
     setUsingFallback(false);
@@ -225,7 +446,7 @@ function App() {
           setGeoError(err && err.message ? err.message : "Retry failed");
           setUsingFallback(true);
         },
-        { enableHighAccuracy: false, timeout: 15000 }
+        { enableHighAccuracy: false, timeout: 15000 },
       );
     } else {
       setGeoError("Geolocation not supported");
@@ -236,7 +457,6 @@ function App() {
   useEffect(() => {
     getItems()
       .then((data) => {
-        // console.log(data);
         setClothingItems(data);
       })
       .catch((error) => {
@@ -244,13 +464,52 @@ function App() {
       });
   }, []);
 
+  const handleUpdateProfile = async ({ name, avatar }) => {
+    try {
+      const token = localStorage.getItem("jwt");
+      if (!token) {
+        console.error("No token found");
+        alert("Please login again to update your profile.");
+        return;
+      }
+
+      console.log("Updating profile with:", { name, avatar });
+      console.log("Current user before update:", currentUser);
+
+      const updatedUser = await updateProfile({ name, avatar });
+      console.log("Profile updated successfully:", updatedUser);
+
+      // Update state with new user data
+      setUserName(updatedUser.name);
+      setCurrentUser(updatedUser);
+
+      // Update localStorage
+      localStorage.setItem("userData", JSON.stringify(updatedUser));
+
+      // Close modal
+      setIsEditProfileModalOpen(false);
+      console.log("Profile updated successfully:", updatedUser);
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      alert(error.message || "Failed to update profile. Please try again.");
+    }
+  };
+
   return (
     <CurrentTemperatureUnitContext.Provider
       value={{ currentTemperatureUnit, handleToggleSwitchChange }}
     >
       <div className="page">
         <div className="page__content">
-          <Header handleAddClick={handleAddClick} weatherData={weatherData} />
+          <Header
+            handleAddClick={handleAddClick}
+            weatherData={weatherData}
+            onLoginClick={handleLoginClick}
+            onRegisterClick={handleRegisterClick}
+            isLoggedIn={isLoggedIn}
+            userName={userName}
+            currentUser={currentUser}
+          />
           {geoError && (
             <div className="geo-banner">
               <p>
@@ -270,21 +529,30 @@ function App() {
                   weatherData={weatherData}
                   handleCardClick={handleCardClick}
                   clothingItems={clothingItems}
+                  onCardLike={handleCardLike}
+                  currentUser={currentUser}
                 />
               }
             />
             <Route
               path="/profile"
               element={
-                <Profile
-                  onCardClick={handleCardClick}
-                  handleAddClick={handleAddClick}
-                  clothingItems={clothingItems}
-                />
+                <ProtectedRoute isLoggedIn={isLoggedIn}>
+                  <Profile
+                    onCardClick={handleCardClick}
+                    handleAddClick={handleAddClick}
+                    clothingItems={clothingItems}
+                    isLoggedIn={isLoggedIn}
+                    userName={userName}
+                    currentUser={currentUser}
+                    onLogout={handleLogout}
+                    onEditProfile={handleEditProfile}
+                    onCardLike={handleCardLike}
+                  />
+                </ProtectedRoute>
               }
             />
-            {/* Fallback route: render Main for unmatched paths to avoid console warnings when
-                the app is served from a subpath that the router doesn't expect. */}
+
             <Route
               path="*"
               element={
@@ -292,13 +560,16 @@ function App() {
                   weatherData={weatherData}
                   handleCardClick={handleCardClick}
                   clothingItems={clothingItems}
+                  onCardLike={handleCardLike}
+                  currentUser={currentUser}
                 />
               }
             />
           </Routes>
-
-          <Footer />
         </div>
+        <Footer />
+
+        {/* MOdals */}
 
         <AddItemModal
           isOpen={activeModal === "add-garment"}
@@ -310,6 +581,25 @@ function App() {
           card={selectedCard}
           onClose={closeActiveModal}
           onDeleteCard={handleDeleteCard}
+          currentUser={currentUser}
+        />
+        <LoginModal
+          isOpen={activeModal === "login"}
+          onClose={closeActiveModal}
+          onLogin={handleLogin}
+          onSwitchToRegister={handleSwitchToRegister}
+        />
+        <RegisterModal
+          isOpen={activeModal === "register"}
+          onClose={closeActiveModal}
+          onRegister={handleRegister}
+          onSwitchToLogin={handleSwitchToLogin}
+        />
+        <EditProfileModal
+          isOpen={isEditProfileModalOpen}
+          onClose={() => setIsEditProfileModalOpen(false)}
+          onEditProfile={handleUpdateProfile}
+          currentUser={currentUser}
         />
       </div>
     </CurrentTemperatureUnitContext.Provider>

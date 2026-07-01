@@ -1,10 +1,14 @@
 .footer {
   display: flex;
   justify-content: space-between;
-  margin: 0;
-  padding: 0;
-  font-family: Cabinet Grotesk, sans-serif;
+  font-family:
+    Cabinet Grotesk,
+    sans-serif;
+  width: 100%;
+  padding: 40px 0 0;
+  margin-top: 40px;
 }
+
 .footer__author {
   margin: 0;
   height: 20px;
@@ -13,4 +17,22 @@
 .footer__date {
   margin: 0;
   height: 20px;
+}
+
+@media screen and (max-width: 900px) {
+  .footer {
+    padding: 16px 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .footer {
+    padding: 12px 0;
+    font-size: 14px;
+    margin-top: 16px;
+  }
 }

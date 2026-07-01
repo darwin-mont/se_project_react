@@ -4,10 +4,18 @@ import ItemCard from "../ItemCard/ItemCard";
 import { useContext } from "react";
 import CurrentTemperatureUnitContext from "../../contexts/CurrentTemperatureUnitContext";
 
-function Main({ weatherData, handleCardClick, clothingItems }) {
+function Main({
+  weatherData,
+  handleCardClick,
+  clothingItems,
+  onCardLike,
+  currentUser,
+}) {
   const { currentTemperatureUnit } = useContext(CurrentTemperatureUnitContext);
-  const filteredItems = clothingItems.filter(
-    (item) => item.weather === weatherData.type
+
+  const items = Array.isArray(clothingItems) ? clothingItems : [];
+  const filteredItems = items.filter(
+    (item) => item.weather === weatherData.type,
   );
 
   return (
@@ -25,13 +33,22 @@ function Main({ weatherData, handleCardClick, clothingItems }) {
           {filteredItems.length === 0 ? (
             <p>No clothing items available for this weather.</p>
           ) : (
-            filteredItems.map((item) => (
-              <ItemCard
-                key={item._id}
-                item={item}
-                onCardClick={handleCardClick}
-              />
-            ))
+            filteredItems.map((item) => {
+              const isLiked =
+                currentUser &&
+                item.likes &&
+                Array.isArray(item.likes) &&
+                item.likes.includes(currentUser._id);
+              return (
+                <ItemCard
+                  key={item._id || item.id}
+                  item={item}
+                  onCardClick={handleCardClick}
+                  onCardLike={onCardLike}
+                  isLiked={isLiked}
+                />
+              );
+            })
           )}
         </ul>
       </section>

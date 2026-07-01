@@ -1,13 +1,15 @@
 .page {
   max-width: 1440px;
-  margin: auto;
-  padding: 0;
+  margin: 0 auto;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
 }
 
 .page__content {
-  max-width: 1360px;
-  padding: 32px 40px;
-  margin: 0;
+  width: 100%;
 }
 
 .geo-banner {
@@ -32,4 +34,16 @@
   padding: 6px 8px;
   border-radius: 4px;
   cursor: pointer;
+}
+
+@media screen and (max-width: 900px) {
+  .page {
+    padding: 20px 16px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .page {
+    padding: 12px 12px;
+  }
 }

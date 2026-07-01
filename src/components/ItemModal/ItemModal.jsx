@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import "./ItemModal.css";
 
-function ItemModal({ activeModal, onClose, card, onDeleteCard }) {
+function ItemModal({ activeModal, onClose, card, onDeleteCard, currentUser }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const yesRef = useRef(null);
+
+  const isOwn = currentUser && card && card.owner === currentUser._id;
 
   const openConfirm = () => setShowConfirm(true);
   const closeConfirm = () => setShowConfirm(false);
@@ -58,14 +60,16 @@ function ItemModal({ activeModal, onClose, card, onDeleteCard }) {
           <div className="modal__caption-row">
             <h2 className="modal__caption">{card.name}</h2>
             <div className="modal__caption-actions">
-              <button
-                onClick={openConfirm}
-                type="button"
-                className="modal__delete-button"
-                aria-label={`Delete ${card?.name || "item"}`}
-              >
-                Delete Item
-              </button>
+              {isOwn && (
+                <button
+                  onClick={openConfirm}
+                  type="button"
+                  className="modal__delete-button"
+                  aria-label={`Delete ${card?.name || "item"}`}
+                >
+                  Delete Item
+                </button>
+              )}
             </div>
           </div>
 

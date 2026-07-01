@@ -1,14 +1,24 @@
 import "./Header.css";
-import logo from "../../assets/Logo.png";
+import logo from "../../assets/Logo.svg";
 import avatar from "../../assets/avatar.png";
 import ToggleSwitch from "../ToggleSwitch/ToggleSwitch";
 import { Link } from "react-router-dom";
 
-function Header({ handleAddClick, weatherData }) {
+function Header({
+  handleAddClick,
+  weatherData,
+  onLoginClick,
+  onRegisterClick,
+  isLoggedIn,
+  userName,
+  currentUser,
+}) {
   const currentDate = new Date().toLocaleString("default", {
     month: "long",
     day: "numeric",
   });
+  const userAvatar = currentUser?.avatar || avatar;
+
   return (
     <header className="header">
       <div className="header__container">
@@ -16,24 +26,49 @@ function Header({ handleAddClick, weatherData }) {
           <img className="header__logo" src={logo} alt="logo" />
         </Link>
         <p className="header__date-and-location">
-          {" "}
           {currentDate}, {weatherData.city}
         </p>
       </div>
-      <ToggleSwitch />
-      <button
-        onClick={handleAddClick}
-        type="button"
-        className="header__add-clothes-btn"
-      >
-        + Add Clothes
-      </button>
-      <Link to="/profile" className="header__link">
-        <div className="header__user-container">
-          <p className="header__username">Terrence Tegegne</p>
-          <img className="header__avatar" src={avatar} alt="Terrence Tegegne" />
-        </div>
-      </Link>
+
+      <div className="header__user-container">
+        <ToggleSwitch />
+
+        <button
+          onClick={handleAddClick}
+          type="button"
+          className="header__add-clothes-btn"
+        >
+          + Add Clothes
+        </button>
+
+        {isLoggedIn ? (
+          <Link to="/profile" className="header__link">
+            <p className="header__username">{userName}</p>
+            <img
+              className="header__avatar"
+              src={userAvatar}
+              alt={`${userName}'s avatar`}
+            />
+          </Link>
+        ) : (
+          <>
+            <button
+              onClick={onRegisterClick}
+              type="button"
+              className="header__auth-btn"
+            >
+              Sign Up
+            </button>
+            <button
+              onClick={onLoginClick}
+              type="button"
+              className="header__auth-btn header__auth-btn_primary"
+            >
+              Log In
+            </button>
+          </>
+        )}
+      </div>
     </header>
   );
 }

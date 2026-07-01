@@ -7,14 +7,20 @@
   overflow: hidden;
 }
 .modal__close.modal__content_type_image {
-  background-image: url("../../Plugin/close-icon.png");
+  background-image: url("../../Plugin/close-icon.svg");
 }
 .modal__image {
-  width: 100%;
-  object-fit: cover;
+  width: 498px;
+  height: 498px;
+  object-fit: contain;
 }
+.modal__swith-button {
+  width: 124px;
+  height: 36px;
+}
+
 .modal__footer {
-  padding: 20px 32px 32px;
+  padding: 20px 32px;
 }
 .modal__caption {
   margin: 0;
@@ -72,20 +78,7 @@
   align-items: center;
   gap: 8px;
 }
-.modal__delete-button {
-  background: transparent;
-  color: #d9534f; /* red text */
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-}
 
-/* Top-right delete button overlay */
-
-/* footer caption actions already styled above */
-
-/* custom confirm modal styles */
 .confirm-backdrop {
   position: absolute;
   inset: 0;

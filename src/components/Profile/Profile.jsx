@@ -1,18 +1,40 @@
 import "./Profile.css";
 import SideBar from "../SideBar/SideBar";
 import ClothesSection from "../ClothesSection/ClothesSection";
+import { Navigate } from "react-router-dom";
 
-function Profile({ onCardClick, handleAddClick, clothingItems = [] }) {
+function Profile({
+  onCardClick,
+  handleAddClick,
+  clothingItems = [],
+  isLoggedIn,
+  userName,
+  currentUser,
+  onLogout,
+  onEditProfile,
+  onCardLike,
+}) {
+  if (!isLoggedIn) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <div className="profile">
       <section className="profile__sidebar">
-        <SideBar />
+        <SideBar
+          userName={userName}
+          currentUser={currentUser}
+          onLogout={onLogout}
+          onEditProfile={onEditProfile}
+        />
       </section>
       <section className="profile__clothing-items">
         <ClothesSection
           onCardClick={onCardClick}
           handleAddClick={handleAddClick}
           clothingItems={clothingItems}
+          onCardLike={onCardLike}
+          currentUser={currentUser}
         />
       </section>
     </div>
