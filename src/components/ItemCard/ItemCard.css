@@ -23,18 +23,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0;
+  padding: 15px;
   pointer-events: none;
+  gap: 8px;
 }
 .card__name {
-  /* position: absolute;
-  top: 15px; */
   margin: 0;
   background-color: #ffffff;
   color: #00000099;
   border-radius: 4px;
-  padding: 12px 12px;
-  gap: 10px;
+  padding: 2px 12px;
   font-family:
     Cabinet Grotesk,
     sans-serif;

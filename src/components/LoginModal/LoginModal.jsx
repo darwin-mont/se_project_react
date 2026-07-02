@@ -17,7 +17,6 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
     values,
     handleChange,
     errors,
-    isValid,
     resetForm,
     validateForm,
     isSubmitted,
@@ -68,7 +67,7 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
           ref={emailRef}
           autoComplete="email"
           aria-invalid={isSubmitted && !!errors.email}
-          aria-describedby="error-email"
+          aria-describedby="login-error-email"
           className={`modal__input ${
             (touched.email || isSubmitted) && errors.email
               ? "modal__input_invalid"
@@ -81,7 +80,7 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
           onBlur={handleBlur}
         />
         <span
-          id="error-email"
+          id="login-error-email"
           role="alert"
           className={`modal__error ${
             (touched.email || isSubmitted) && errors.email
@@ -100,7 +99,7 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
           ref={passwordRef}
           autoComplete="password"
           aria-invalid={isSubmitted && !!errors.password}
-          aria-describedby="error-password"
+          aria-describedby="login-error-password"
           className={`modal__input ${
             (touched.password || isSubmitted) && errors.password
               ? "modal__input_invalid"
@@ -113,7 +112,7 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
           onBlur={handleBlur}
         />
         <span
-          id="error-password"
+          id="login-error-password"
           role="alert"
           className={`modal__error ${
             (touched.password || isSubmitted) && errors.password

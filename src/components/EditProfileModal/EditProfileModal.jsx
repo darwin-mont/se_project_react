@@ -18,7 +18,6 @@ const EditProfileModal = ({ isOpen, onClose, onEditProfile, currentUser }) => {
     values,
     handleChange,
     errors,
-    isValid,
     resetForm,
     validateForm,
     isSubmitted,
@@ -81,7 +80,7 @@ const EditProfileModal = ({ isOpen, onClose, onEditProfile, currentUser }) => {
           ref={nameRef}
           autoComplete="name"
           aria-invalid={isSubmitted && !!errors.name}
-          aria-describedby="error-name"
+          aria-describedby="editProfile-error-name"
           className={`modal__input ${
             (touched.name || isSubmitted) && errors.name
               ? "modal__input_invalid"
@@ -94,7 +93,7 @@ const EditProfileModal = ({ isOpen, onClose, onEditProfile, currentUser }) => {
           onBlur={handleBlur}
         />
         <span
-          id="error-name"
+          id="editProfile-error-name"
           role="alert"
           className={`modal__error ${
             (touched.name || isSubmitted) && errors.name
@@ -114,7 +113,7 @@ const EditProfileModal = ({ isOpen, onClose, onEditProfile, currentUser }) => {
           ref={avatarURLRef}
           autoComplete="off"
           aria-invalid={isSubmitted && !!errors.avatarURL}
-          aria-describedby="error-avatarURL"
+          aria-describedby="editProfile-error-avatarURL"
           className={`modal__input ${
             (touched.avatarURL || isSubmitted) && errors.avatarURL
               ? "modal__input_invalid"
@@ -127,7 +126,7 @@ const EditProfileModal = ({ isOpen, onClose, onEditProfile, currentUser }) => {
           onBlur={handleBlur}
         />
         <span
-          id="error-avatarURL"
+          id="editProfile-error-avatarURL"
           role="alert"
           className={`modal__error ${
             (touched.avatarURL || isSubmitted) && errors.avatarURL

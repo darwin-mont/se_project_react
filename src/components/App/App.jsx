@@ -6,14 +6,13 @@ import Header from "../Header/Header";
 import Main from "../Main/Main";
 import Footer from "../Footer/Footer";
 import AddItemModal from "../AddItemModal/AddItemModal";
-import ItemModal from "../ItemModal/ItemModal";
-import ItemCard from "../ItemCard/ItemCard";
 import Profile from "../../components/Profile/Profile";
 import LoginModal from "../../components/LoginModal/LoginModal";
 import RegisterModal from "../../components/RegisterModal/RegisterModal";
 import ProtectedRoute from "../ProtectedRoute/ProtectedRoute";
 import { getWeather, filterWeatherData } from "../../utils/weatherApi";
 import CurrentTemperatureUnitContext from "../../contexts/CurrentTemperatureUnitContext";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
 import {
   getItems,
   addItem,
@@ -24,7 +23,7 @@ import {
   addCardLike,
   removeCardLike,
 } from "../../utils/api";
-
+import ItemModal from "../ItemModal/ItemModal";
 import EditProfileModal from "../EditProfileModal/EditProfileModal";
 import { updateProfile } from "../../utils/api";
 
@@ -87,6 +86,11 @@ function App() {
   };
 
   const handleAddClick = () => {
+    if (!isLoggedIn) {
+      alert("Please log in to add clothes.");
+      setActiveModal("login");
+      return;
+    }
     setActiveModal("add-garment");
   };
 
@@ -184,12 +188,31 @@ function App() {
 
   const handleRegister = async ({ name, email, avatarURL, password }) => {
     try {
+      // Register the user
       const userData = await registerUser({ name, email, avatarURL, password });
+      console.log("Registration successful:", userData);
+
+      //
+      let token = localStorage.getItem("jwt");
+      let finalUserData = userData;
+      if (!token) {
+        console.log(
+          "No token found after registration, attempting auto-login...",
+        );
+        const loginData = await loginUser({ email, password });
+        token = localStorage.getItem("jwt");
+        finalUserData = loginData;
+        console.log("Auto-login successful:", loginData);
+      }
+
+      // Set state and store data
       setIsLoggedIn(true);
-      setUserName(userData.name);
-      setCurrentUser(userData);
+      setUserName(finalUserData.name || finalUserData.data?.name || "User");
+      setCurrentUser(finalUserData);
+      localStorage.setItem("userData", JSON.stringify(finalUserData));
+      // Token stored in localStorage by loginUser
+
       setActiveModal("");
-      localStorage.setItem("userData", JSON.stringify(userData));
       navigate("/profile");
     } catch (error) {
       console.error("Registration failed:", error);
@@ -205,7 +228,6 @@ function App() {
     localStorage.removeItem("userData");
     setActiveModal("");
     navigate("/");
-    console.log("user logged out"); //debugging implementation
   };
 
   const handleSwitchToRegister = () => {
@@ -227,12 +249,8 @@ function App() {
       weather: inputValues.weatherType,
     };
 
-    console.log("Sending to API:", newCardData);
-
     addItem(newCardData)
       .then((response) => {
-        console.log("API response:", response);
-
         // Extract the item from response
         let addedItem = response;
 
@@ -241,12 +259,9 @@ function App() {
           addedItem = response.data;
         }
 
-        console.log("Extracted item:", addedItem);
-
         // Update the state with the new item
         setClothingItems((prevItems) => {
           const updatedItems = [...prevItems, addedItem];
-          console.log("New items list:", updatedItems);
           return updatedItems;
         });
 
@@ -298,7 +313,6 @@ function App() {
         try {
           // -- verification with backend
           const userData = await getCurrentUser();
-          console.log("Auto-login successful:", userData);
           setIsLoggedIn(true);
           setUserName(userData.name || "User");
           setCurrentUser(userData);
@@ -473,22 +487,27 @@ function App() {
         return;
       }
 
-      console.log("Updating profile with:", { name, avatar });
-      console.log("Current user before update:", currentUser);
+      if (!currentUser || !currentUser._id) {
+        console.error("Current user data is missing _id");
+        alert("User data is missing. Please login again.");
+        return;
+      }
+      console.log("Update profile for user:", currentUser._id);
+      console.log("New data:", { name, avatar });
 
       const updatedUser = await updateProfile({ name, avatar });
-      console.log("Profile updated successfully:", updatedUser);
+      console.log("Profile update response", updatedUser);
 
-      // Update state with new user data
-      setUserName(updatedUser.name);
-      setCurrentUser(updatedUser);
+      const mergedUser = { ...currentUser, ...updatedUser };
+      setUserName(mergedUser.name);
+      setCurrentUser(mergedUser);
 
       // Update localStorage
-      localStorage.setItem("userData", JSON.stringify(updatedUser));
+      localStorage.setItem("userData", JSON.stringify(mergedUser));
 
       // Close modal
       setIsEditProfileModalOpen(false);
-      console.log("Profile updated successfully:", updatedUser);
+      console.log("Profile updated successfully:", mergedUser);
     } catch (error) {
       console.error("Failed to update profile:", error);
       alert(error.message || "Failed to update profile. Please try again.");
@@ -496,113 +515,109 @@ function App() {
   };
 
   return (
-    <CurrentTemperatureUnitContext.Provider
-      value={{ currentTemperatureUnit, handleToggleSwitchChange }}
-    >
-      <div className="page">
-        <div className="page__content">
-          <Header
-            handleAddClick={handleAddClick}
-            weatherData={weatherData}
-            onLoginClick={handleLoginClick}
-            onRegisterClick={handleRegisterClick}
-            isLoggedIn={isLoggedIn}
-            userName={userName}
-            currentUser={currentUser}
-          />
-          {geoError && (
-            <div className="geo-banner">
-              <p>
-                Could not get your location ({geoError}). Showing default
-                location instead.
-              </p>
-              <button className="geo-retry" onClick={handleRetryGeolocation}>
-                Retry location
-              </button>
-            </div>
-          )}
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <Main
-                  weatherData={weatherData}
-                  handleCardClick={handleCardClick}
-                  clothingItems={clothingItems}
-                  onCardLike={handleCardLike}
-                  currentUser={currentUser}
-                />
-              }
+    <CurrentUserContext.Provider value={currentUser}>
+      <CurrentTemperatureUnitContext.Provider
+        value={{ currentTemperatureUnit, handleToggleSwitchChange }}
+      >
+        <div className="page">
+          <div className="page__content">
+            <Header
+              handleAddClick={handleAddClick}
+              weatherData={weatherData}
+              onLoginClick={handleLoginClick}
+              onRegisterClick={handleRegisterClick}
+              isLoggedIn={isLoggedIn}
             />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute isLoggedIn={isLoggedIn}>
-                  <Profile
-                    onCardClick={handleCardClick}
-                    handleAddClick={handleAddClick}
+            {geoError && (
+              <div className="geo-banner">
+                <p>
+                  Could not get your location ({geoError}). Showing default
+                  location instead.
+                </p>
+                <button className="geo-retry" onClick={handleRetryGeolocation}>
+                  Retry location
+                </button>
+              </div>
+            )}
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <Main
+                    weatherData={weatherData}
+                    handleCardClick={handleCardClick}
                     clothingItems={clothingItems}
-                    isLoggedIn={isLoggedIn}
-                    userName={userName}
-                    currentUser={currentUser}
-                    onLogout={handleLogout}
-                    onEditProfile={handleEditProfile}
                     onCardLike={handleCardLike}
                   />
-                </ProtectedRoute>
-              }
-            />
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute isLoggedIn={isLoggedIn}>
+                    <Profile
+                      onCardClick={handleCardClick}
+                      handleAddClick={handleAddClick}
+                      clothingItems={clothingItems}
+                      isLoggedIn={isLoggedIn}
+                      userName={userName}
+                      onLogout={handleLogout}
+                      onEditProfile={handleEditProfile}
+                      onCardLike={handleCardLike}
+                    />
+                  </ProtectedRoute>
+                }
+              />
 
-            <Route
-              path="*"
-              element={
-                <Main
-                  weatherData={weatherData}
-                  handleCardClick={handleCardClick}
-                  clothingItems={clothingItems}
-                  onCardLike={handleCardLike}
-                  currentUser={currentUser}
-                />
-              }
+              <Route
+                path="*"
+                element={
+                  <Main
+                    weatherData={weatherData}
+                    handleCardClick={handleCardClick}
+                    clothingItems={clothingItems}
+                    onCardLike={handleCardLike}
+                  />
+                }
+              />
+            </Routes>
+          </div>
+          <Footer />
+
+          {/* MOdals */}
+          {isLoggedIn && (
+            <AddItemModal
+              isOpen={activeModal === "add-garment"}
+              onClose={closeActiveModal}
+              onAddItem={onAddItem}
             />
-          </Routes>
+          )}
+          <ItemModal
+            activeModal={activeModal}
+            card={selectedCard}
+            onClose={closeActiveModal}
+            onDeleteCard={handleDeleteCard}
+          />
+          <LoginModal
+            isOpen={activeModal === "login"}
+            onClose={closeActiveModal}
+            onLogin={handleLogin}
+            onSwitchToRegister={handleSwitchToRegister}
+          />
+          <RegisterModal
+            isOpen={activeModal === "register"}
+            onClose={closeActiveModal}
+            onRegister={handleRegister}
+            onSwitchToLogin={handleSwitchToLogin}
+          />
+          <EditProfileModal
+            isOpen={isEditProfileModalOpen}
+            onClose={() => setIsEditProfileModalOpen(false)}
+            onEditProfile={handleUpdateProfile}
+          />
         </div>
-        <Footer />
-
-        {/* MOdals */}
-
-        <AddItemModal
-          isOpen={activeModal === "add-garment"}
-          onClose={closeActiveModal}
-          onAddItem={onAddItem}
-        />
-        <ItemModal
-          activeModal={activeModal}
-          card={selectedCard}
-          onClose={closeActiveModal}
-          onDeleteCard={handleDeleteCard}
-          currentUser={currentUser}
-        />
-        <LoginModal
-          isOpen={activeModal === "login"}
-          onClose={closeActiveModal}
-          onLogin={handleLogin}
-          onSwitchToRegister={handleSwitchToRegister}
-        />
-        <RegisterModal
-          isOpen={activeModal === "register"}
-          onClose={closeActiveModal}
-          onRegister={handleRegister}
-          onSwitchToLogin={handleSwitchToLogin}
-        />
-        <EditProfileModal
-          isOpen={isEditProfileModalOpen}
-          onClose={() => setIsEditProfileModalOpen(false)}
-          onEditProfile={handleUpdateProfile}
-          currentUser={currentUser}
-        />
-      </div>
-    </CurrentTemperatureUnitContext.Provider>
+      </CurrentTemperatureUnitContext.Provider>
+    </CurrentUserContext.Provider>
   );
 }
 

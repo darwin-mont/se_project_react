@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
 import "./ItemModal.css";
 
-function ItemModal({ activeModal, onClose, card, onDeleteCard, currentUser }) {
+function ItemModal({ activeModal, onClose, card, onDeleteCard }) {
+  const currentUser = useContext(CurrentUserContext);
   const [showConfirm, setShowConfirm] = useState(false);
   const yesRef = useRef(null);
 

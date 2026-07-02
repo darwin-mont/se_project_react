@@ -21,7 +21,6 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
     values,
     handleChange,
     errors,
-    isValid,
     resetForm,
     validateForm,
     isSubmitted,
@@ -94,7 +93,7 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           ref={emailRef}
           autoComplete="email"
           aria-invalid={isSubmitted && !!errors.email}
-          aria-describedby="error-email"
+          aria-describedby="login-error-email"
           className={`modal__input ${
             (touched.email || isSubmitted) && errors.email
               ? "modal__input_invalid"
@@ -107,7 +106,7 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           onBlur={handleBlur}
         />
         <span
-          id="error-email"
+          id="login-error-email"
           role="alert"
           className={`modal__error ${
             (touched.email || isSubmitted) && errors.email
@@ -126,7 +125,7 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           ref={passwordRef}
           autoComplete="new-password"
           aria-invalid={isSubmitted && !!errors.password}
-          aria-describedby="error-password"
+          aria-describedby="register-error-password"
           className={`modal__input ${
             (touched.password || isSubmitted) && errors.password
               ? "modal__input_invalid"
@@ -139,7 +138,7 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           onBlur={handleBlur}
         />
         <span
-          id="error-password"
+          id="register-error-password"
           role="alert"
           className={`modal__error ${
             (touched.password || isSubmitted) && errors.password
@@ -158,7 +157,7 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           ref={nameRef}
           autoComplete="name"
           aria-invalid={isSubmitted && !!errors.name}
-          aria-describedby="error-name"
+          aria-describedby="register-error-name"
           className={`modal__input ${
             (touched.name || isSubmitted) && errors.name
               ? "modal__input_invalid"
@@ -171,7 +170,7 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           onBlur={handleBlur}
         />
         <span
-          id="error-name"
+          id="register-error-name"
           role="alert"
           className={`modal__error ${
             (touched.name || isSubmitted) && errors.name
@@ -190,7 +189,7 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           ref={avatarURLRef}
           autoComplete="off"
           aria-invalid={isSubmitted && !!errors.avatarURL}
-          aria-describedby="error-avatarURL"
+          aria-describedby="register-error-avatarURL"
           className={`modal__input ${
             (touched.avatarURL || isSubmitted) && errors.avatarURL
               ? "modal__input_invalid"
@@ -203,7 +202,7 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           onBlur={handleBlur}
         />
         <span
-          id="error-avatarURL"
+          id="register-error-avatarURL"
           role="alert"
           className={`modal__error ${
             (touched.avatarURL || isSubmitted) && errors.avatarURL

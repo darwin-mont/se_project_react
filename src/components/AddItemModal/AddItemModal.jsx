@@ -19,7 +19,6 @@ const AddItemModal = ({ isOpen, onAddItem, onClose }) => {
     values,
     handleChange,
     errors,
-    isValid,
     resetForm,
     validateForm,
     isSubmitted,
@@ -75,7 +74,7 @@ const AddItemModal = ({ isOpen, onAddItem, onClose }) => {
           ref={nameRef}
           autoComplete="off"
           aria-invalid={isSubmitted && !!errors.name}
-          aria-describedby="error-name"
+          aria-describedby="addItem-error-name"
           className={`modal__input ${
             (touched.name || isSubmitted) && errors.name
               ? "modal__input_invalid"
@@ -88,7 +87,7 @@ const AddItemModal = ({ isOpen, onAddItem, onClose }) => {
           onBlur={handleBlur}
         />
         <span
-          id="error-name"
+          id="addItem-error-name"
           role="alert"
           className={`modal__error ${
             (touched.name || isSubmitted) && errors.name

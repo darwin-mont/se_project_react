@@ -1,20 +1,29 @@
+import { useContext } from "react";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
+import CurrentTemperatureUnitContext from "../../contexts/CurrentTemperatureUnitContext";
+import { defaultClothingItems } from "../../utils/constants";
 import "./Main.css";
 import WeatherCard from "../WeatherCard/WeatherCard";
 import ItemCard from "../ItemCard/ItemCard";
-import { useContext } from "react";
-import CurrentTemperatureUnitContext from "../../contexts/CurrentTemperatureUnitContext";
 
-function Main({
-  weatherData,
-  handleCardClick,
-  clothingItems,
-  onCardLike,
-  currentUser,
-}) {
+function Main({ weatherData, handleCardClick, clothingItems, onCardLike }) {
+  const currentUser = useContext(CurrentUserContext);
   const { currentTemperatureUnit } = useContext(CurrentTemperatureUnitContext);
 
   const items = Array.isArray(clothingItems) ? clothingItems : [];
-  const filteredItems = items.filter(
+
+  let displayItems = [];
+  if (currentUser) {
+    displayItems = items.filter((item) => item.owner === currentUser._id);
+  } else {
+    displayItems = defaultClothingItems;
+  }
+  displayItems = displayItems.map((item) => ({
+    ...item,
+    imageUrl: item.imageUrl || item.link || "",
+  }));
+
+  const filteredItems = displayItems.filter(
     (item) => item.weather === weatherData.type,
   );
 
@@ -41,7 +50,9 @@ function Main({
                 item.likes.includes(currentUser._id);
               return (
                 <ItemCard
-                  key={item._id || item.id}
+                  key={
+                    item._id || item.id || `item-${item.name}-${Math.random()}`
+                  }
                   item={item}
                   onCardClick={handleCardClick}
                   onCardLike={onCardLike}

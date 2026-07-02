@@ -1,7 +1,9 @@
-import "./Profile.css";
+import { useContext } from "react";
+import { Navigate } from "react-router-dom";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
 import SideBar from "../SideBar/SideBar";
 import ClothesSection from "../ClothesSection/ClothesSection";
-import { Navigate } from "react-router-dom";
+import "./Profile.css";
 
 function Profile({
   onCardClick,
@@ -9,11 +11,12 @@ function Profile({
   clothingItems = [],
   isLoggedIn,
   userName,
-  currentUser,
   onLogout,
   onEditProfile,
   onCardLike,
 }) {
+  const currentUser = useContext(CurrentUserContext);
+
   if (!isLoggedIn) {
     return <Navigate to="/" replace />;
   }
@@ -34,7 +37,6 @@ function Profile({
           handleAddClick={handleAddClick}
           clothingItems={clothingItems}
           onCardLike={onCardLike}
-          currentUser={currentUser}
         />
       </section>
     </div>

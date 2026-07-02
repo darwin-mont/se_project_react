@@ -1,20 +1,21 @@
-import "./ClothesSection.css";
+import { useContext } from "react";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
 import ItemCard from "../ItemCard/ItemCard";
 import { defaultClothingItems } from "../../utils/constants";
-import AddItemModal from "../AddItemModal/AddItemModal";
-import { getItems } from "../../utils/api";
-import { useEffect, useState } from "react";
+import "./ClothesSection.css";
 
 function ClothesSection({
   onCardClick,
   handleAddClick,
   clothingItems,
   onCardLike,
-  currentUser,
 }) {
+  const currentUser = useContext(CurrentUserContext);
   const items = Array.isArray(clothingItems)
     ? clothingItems
     : defaultClothingItems;
+
+  const ownItems = items.filter((item) => item.owner === currentUser?._id);
 
   return (
     <div className="clothes-section">
@@ -30,12 +31,12 @@ function ClothesSection({
       </div>
 
       <ul className="clothes-section__list">
-        {items.length === 0 ? (
+        {ownItems.length === 0 ? (
           <p className="clothes-section__empty">
             No clothes added yet. Add your first item!
           </p>
         ) : (
-          items.map((item) => {
+          ownItems.map((item) => {
             const isLiked =
               currentUser &&
               item.likes &&

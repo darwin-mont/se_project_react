@@ -1,6 +1,8 @@
+import { useContext } from "react";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
 import "./Header.css";
 import logo from "../../assets/Logo.svg";
-import avatar from "../../assets/avatar.png";
+import defaultAvatar from "../../assets/avatar.png";
 import ToggleSwitch from "../ToggleSwitch/ToggleSwitch";
 import { Link } from "react-router-dom";
 
@@ -11,13 +13,14 @@ function Header({
   onRegisterClick,
   isLoggedIn,
   userName,
-  currentUser,
 }) {
+  const currentUser = useContext(CurrentUserContext);
   const currentDate = new Date().toLocaleString("default", {
     month: "long",
     day: "numeric",
   });
-  const userAvatar = currentUser?.avatar || avatar;
+  const userAvatar = currentUser?.avatar || defaultAvatar;
+  const displayName = currentUser?.name || "User";
 
   return (
     <header className="header">
@@ -33,21 +36,23 @@ function Header({
       <div className="header__user-container">
         <ToggleSwitch />
 
-        <button
-          onClick={handleAddClick}
-          type="button"
-          className="header__add-clothes-btn"
-        >
-          + Add Clothes
-        </button>
+        {isLoggedIn && (
+          <button
+            onClick={handleAddClick}
+            type="button"
+            className="header__add-clothes-btn"
+          >
+            + Add Clothes
+          </button>
+        )}
 
         {isLoggedIn ? (
           <Link to="/profile" className="header__link">
-            <p className="header__username">{userName}</p>
+            <p className="header__username">{displayName}</p>
             <img
               className="header__avatar"
               src={userAvatar}
-              alt={`${userName}'s avatar`}
+              alt={`${displayName}'s avatar`}
             />
           </Link>
         ) : (
