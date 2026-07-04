@@ -99,14 +99,12 @@ function App() {
   const handleCardLike = ({ id, isLiked }) => {
     const token = localStorage.getItem("jwt");
 
-    // Safety check
     if (!currentUser) {
       console.error("No user logged in");
       return;
     }
 
     if (!isLiked) {
-      // Add like
       addCardLike(id, token)
         .then((updatedCard) => {
           if (updatedCard && updatedCard._id) {
@@ -114,7 +112,6 @@ function App() {
               cards.map((item) => (item._id === id ? updatedCard : item)),
             );
           } else {
-            // Fallback: manually add like
             setClothingItems((cards) =>
               cards.map((item) => {
                 if (item._id === id) {
@@ -170,6 +167,10 @@ function App() {
     setActiveModal("register");
   };
 
+  const closeActiveModal = () => {
+    setActiveModal("");
+  };
+
   const handleLogin = async ({ email, password }) => {
     try {
       const userData = await loginUser({ email, password });
@@ -212,7 +213,7 @@ function App() {
       localStorage.setItem("userData", JSON.stringify(finalUserData));
       // Token stored in localStorage by loginUser
 
-      setActiveModal("");
+      closeActiveModal();
       navigate("/profile");
     } catch (error) {
       console.error("Registration failed:", error);
@@ -226,7 +227,7 @@ function App() {
     setCurrentUser(null);
     localStorage.removeItem("jwt");
     localStorage.removeItem("userData");
-    setActiveModal("");
+    closeActiveModal();
     navigate("/");
   };
 
@@ -251,22 +252,17 @@ function App() {
 
     addItem(newCardData)
       .then((response) => {
-        // Extract the item from response
         let addedItem = response;
 
-        // If response has a 'data' property, use that
         if (response && response.data) {
           addedItem = response.data;
         }
-
-        // Update the state with the new item
         setClothingItems((prevItems) => {
           const updatedItems = [...prevItems, addedItem];
           return updatedItems;
         });
 
-        // Close the modal
-        setActiveModal(""); // Use this instead of closeActiveModal()
+        closeActiveModal();
       })
       .catch((err) => {
         console.error("Failed to add item:", err);
@@ -274,23 +270,19 @@ function App() {
       });
   };
 
-  const closeActiveModal = () => {
-    setActiveModal("");
-  };
-
   const handleDeleteCard = (card) => {
     if (!card) return;
-    // If card has an _id, attempt to delete from backend
+
     if (card._id !== undefined && card._id !== null) {
       deleteItem(card._id)
         .then(() => {
           setClothingItems((prev) => prev.filter((c) => c._id !== card._id));
+          closeActiveModal();
         })
         .catch((err) => {
           console.error("Failed to delete item:", err);
         });
     } else {
-      // Local-only card (not persisted) — remove by matching unique combination
       setClothingItems((prev) =>
         prev.filter(
           (c) =>
@@ -300,11 +292,57 @@ function App() {
             ),
         ),
       );
+      closeActiveModal();
     }
   };
 
   //-----//
 
+  // ====== Escape key listener ======
+  useEffect(() => {
+    if (!activeModal && !isEditProfileModalOpen) return;
+
+    const handleEscClose = (e) => {
+      if (e.key === "Escape") {
+        if (activeModal) {
+          closeActiveModal();
+        }
+
+        if (isEditProfileModalOpen) {
+          setIsEditProfileModalOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleEscClose);
+
+    return () => {
+      document.removeEventListener("keydown", handleEscClose);
+    };
+  }, [activeModal, isEditProfileModalOpen]);
+
+  useEffect(() => {
+    if (!activeModal && !isEditProfileModalOpen) return;
+
+    const handleClickOutside = (e) => {
+      const modalElement = document.querySelector(".modal_opened");
+      if (modalElement && e.target === modalElement) {
+        if (activeModal) {
+          closeActiveModal();
+        }
+        if (isEditProfileModalOpen) {
+          setIsEditProfileModalOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [activeModal, isEditProfileModalOpen]);
+
+  // === TOKEN check on MOUNT ===//
   useEffect(() => {
     const checkToken = async () => {
       const token = localStorage.getItem("jwt");
@@ -358,7 +396,6 @@ function App() {
     const run = async () => {
       try {
         if (navigator && navigator.geolocation) {
-          // If Permissions API is present, check first to avoid unnecessary prompt
           let permState = "prompt";
           if (navigator.permissions && navigator.permissions.query) {
             try {
@@ -378,7 +415,6 @@ function App() {
             return;
           }
 
-          // Attempt to get position with a reasonable timeout, retry once on timeout
           try {
             const pos = await getPosition({
               enableHighAccuracy: false,
@@ -391,7 +427,6 @@ function App() {
             await fetchForCoords(userCoords);
           } catch (err) {
             if (err && err.code === 3) {
-              // timeout -> one retry
               try {
                 const pos = await getPosition({
                   enableHighAccuracy: false,
@@ -418,7 +453,6 @@ function App() {
             }
           }
         } else {
-          // No geolocation support
           await fetchForCoords(coordinates);
         }
       } catch (e) {
@@ -439,7 +473,7 @@ function App() {
   function handleRetryGeolocation() {
     setGeoError(null);
     setUsingFallback(false);
-    // Re-run the same effect logic by calling getCurrentPosition directly
+
     if (navigator && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -502,10 +536,8 @@ function App() {
       setUserName(mergedUser.name);
       setCurrentUser(mergedUser);
 
-      // Update localStorage
       localStorage.setItem("userData", JSON.stringify(mergedUser));
 
-      // Close modal
       setIsEditProfileModalOpen(false);
       console.log("Profile updated successfully:", mergedUser);
     } catch (error) {

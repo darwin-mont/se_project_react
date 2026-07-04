@@ -1,9 +1,12 @@
 // components/EditProfileModal/EditProfileModal.jsx
 import { useFormWithValidation } from "../../hooks/useFormWithValidation";
+import CurrentUserContext from "../../contexts/CurrentUserContext";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useContext } from "react";
 
-const EditProfileModal = ({ isOpen, onClose, onEditProfile, currentUser }) => {
+const EditProfileModal = ({ isOpen, onClose, onEditProfile }) => {
+  const currentUser = useContext(CurrentUserContext);
+
   const defaultValues = {
     name: currentUser?.name || "",
     avatarURL: currentUser?.avatar || "",
@@ -29,15 +32,28 @@ const EditProfileModal = ({ isOpen, onClose, onEditProfile, currentUser }) => {
   const nameRef = useRef(null);
   const avatarURLRef = useRef(null);
 
-  // Update form values when currentUser changes
   useEffect(() => {
-    if (currentUser) {
+    console.log("Current values:", values);
+  }, [values]);
+
+  useEffect(() => {
+    console.log(
+      "useEffect triggered - isOpen:",
+      isOpen,
+      "currentUser:",
+      currentUser,
+    );
+    if (isOpen && currentUser) {
+      console.log("Setting values to:", {
+        name: currentUser.name || "",
+        avatarURL: currentUser.avatar || "",
+      });
       setValues({
         name: currentUser.name || "",
         avatarURL: currentUser.avatar || "",
       });
     }
-  }, [currentUser, setValues]);
+  }, [isOpen, currentUser, setValues]);
 
   function handleSubmit(evt) {
     evt.preventDefault();
@@ -45,7 +61,6 @@ const EditProfileModal = ({ isOpen, onClose, onEditProfile, currentUser }) => {
 
     if (valid) {
       onEditProfile({ name: values.name, avatar: values.avatarURL });
-      resetForm();
       return;
     }
 
@@ -66,7 +81,7 @@ const EditProfileModal = ({ isOpen, onClose, onEditProfile, currentUser }) => {
 
   return (
     <ModalWithForm
-      title="Change Profile Data "
+      title="Change Profile Data"
       name="edit-profile"
       isOpen={isOpen}
       onClose={handleClose}

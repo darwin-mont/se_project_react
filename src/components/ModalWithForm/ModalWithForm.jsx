@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import "./ModalWithForm.css";
 
 function ModalWithForm({
@@ -8,7 +9,7 @@ function ModalWithForm({
   onClose,
   children,
   onSubmit,
-  footerContent, //new prop for additional buttons/links
+  footerContent,
 }) {
   return (
     <div className={`modal ${isOpen ? "modal_opened" : ""}`}>

@@ -1,6 +1,6 @@
 import { useFormWithValidation } from "../../hooks/useFormWithValidation";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 const AddItemModal = ({ isOpen, onAddItem, onClose }) => {
   const defaultValues = {
@@ -30,12 +30,17 @@ const AddItemModal = ({ isOpen, onAddItem, onClose }) => {
   const linkRef = useRef(null);
   const weatherRef = useRef(null);
 
+  useEffect(() => {
+    if (isOpen) {
+      resetForm();
+    }
+  }, [isOpen]);
+
   function handleSubmit(evt) {
     evt.preventDefault();
     const { valid, errors: nextErrors } = validateForm();
     if (valid) {
       onAddItem(values);
-      resetForm();
       return;
     }
 
@@ -54,7 +59,6 @@ const AddItemModal = ({ isOpen, onAddItem, onClose }) => {
     }
   }
   function handleClose() {
-    // clear form state when closing so errors don't persist
     resetForm();
     onClose();
   }

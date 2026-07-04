@@ -47,7 +47,6 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
     }
   }
   function handleClose() {
-    // clear form state when closing so errors don't persist
     resetForm();
     onClose();
   }
@@ -58,6 +57,16 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
       isOpen={isOpen}
       onClose={handleClose}
       onSubmit={handleSubmit}
+      btnText="Log In"
+      footerContent={
+        <button
+          type="button"
+          className="modal__switch-button"
+          onClick={onSwitchToRegister}
+        >
+          or SignUp
+        </button>
+      }
     >
       <label htmlFor="login-email" className="modal__label">
         Email
