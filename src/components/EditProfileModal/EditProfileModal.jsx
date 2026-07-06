@@ -6,6 +6,9 @@ import { useRef, useEffect, useContext } from "react";
 
 const EditProfileModal = ({ isOpen, onClose, onEditProfile }) => {
   const currentUser = useContext(CurrentUserContext);
+  if (!currentUser) {
+    return null;
+  }
 
   const defaultValues = {
     name: currentUser?.name || "",

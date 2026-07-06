@@ -43,9 +43,8 @@ function App() {
   const [currentTemperatureUnit, setCurrentTemperatureUnit] = useState("F");
   const [geoError, setGeoError] = useState(null);
   const [usingFallback, setUsingFallback] = useState(false);
-  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
 
-  ///-------///
+  // === === //
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return !!localStorage.getItem("jwt");
@@ -178,7 +177,7 @@ function App() {
       setIsLoggedIn(true);
       setUserName(userData.name || "User");
       setCurrentUser(userData);
-      setActiveModal("");
+      closeActiveModal();
       localStorage.setItem("userData", JSON.stringify(userData));
       navigate("/profile");
     } catch (error) {
@@ -240,7 +239,7 @@ function App() {
   };
 
   const handleEditProfile = () => {
-    setIsEditProfileModalOpen(true);
+    setActiveModal("edit-profile");
   };
 
   const onAddItem = (inputValues) => {
@@ -258,7 +257,7 @@ function App() {
           addedItem = response.data;
         }
         setClothingItems((prevItems) => {
-          const updatedItems = [...prevItems, addedItem];
+          const updatedItems = [addedItem, ...prevItems];
           return updatedItems;
         });
 
@@ -300,7 +299,7 @@ function App() {
 
   // ====== Escape key listener ======
   useEffect(() => {
-    if (!activeModal && !isEditProfileModalOpen) return;
+    if (!activeModal) return;
 
     const handleEscClose = (e) => {
       if (e.key === "Escape") {
@@ -308,8 +307,8 @@ function App() {
           closeActiveModal();
         }
 
-        if (isEditProfileModalOpen) {
-          setIsEditProfileModalOpen(false);
+        if (activeModal) {
+          closeActiveModal(false);
         }
       }
     };
@@ -319,20 +318,15 @@ function App() {
     return () => {
       document.removeEventListener("keydown", handleEscClose);
     };
-  }, [activeModal, isEditProfileModalOpen]);
+  }, [activeModal]);
 
   useEffect(() => {
-    if (!activeModal && !isEditProfileModalOpen) return;
+    if (!activeModal) return;
 
     const handleClickOutside = (e) => {
       const modalElement = document.querySelector(".modal_opened");
       if (modalElement && e.target === modalElement) {
-        if (activeModal) {
-          closeActiveModal();
-        }
-        if (isEditProfileModalOpen) {
-          setIsEditProfileModalOpen(false);
-        }
+        closeActiveModal();
       }
     };
 
@@ -340,7 +334,7 @@ function App() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [activeModal, isEditProfileModalOpen]);
+  }, [closeActiveModal]);
 
   // === TOKEN check on MOUNT ===//
   useEffect(() => {
@@ -538,7 +532,7 @@ function App() {
 
       localStorage.setItem("userData", JSON.stringify(mergedUser));
 
-      setIsEditProfileModalOpen(false);
+      closeActiveModal();
       console.log("Profile updated successfully:", mergedUser);
     } catch (error) {
       console.error("Failed to update profile:", error);
@@ -643,8 +637,8 @@ function App() {
             onSwitchToLogin={handleSwitchToLogin}
           />
           <EditProfileModal
-            isOpen={isEditProfileModalOpen}
-            onClose={() => setIsEditProfileModalOpen(false)}
+            isOpen={activeModal === "edit-profile"}
+            onClose={closeActiveModal}
             onEditProfile={handleUpdateProfile}
           />
         </div>
