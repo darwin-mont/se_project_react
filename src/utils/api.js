@@ -1,6 +1,6 @@
 const baseUrl =
   process.env.NODE_ENV === "production"
-    ? "https://api.watawe.unibuttons.com"
+    ? "https://api.watawe.unibutton.com"
     : "http://localhost:3001";
 
 function getToken() {
