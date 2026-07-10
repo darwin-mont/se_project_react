@@ -1,7 +1,5 @@
 import { useState } from "react";
 
-// validationRules example:
-// { name: { required: true, minLength: 1, maxLength: 30 }, link: { required: true, type: 'url' } }
 export function useFormWithValidation(defaultValues, validationRules = {}) {
   const [values, setValues] = useState(defaultValues);
   const [errors, setErrors] = useState({});

@@ -1,6 +1,6 @@
 import { useFormWithValidation } from "../../hooks/useFormWithValidation";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 
 const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
   const defaultValues = {
@@ -32,6 +32,12 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
   const avatarURLRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      resetForm();
+    }
+  }, [isOpen, resetForm]);
 
   function handleSubmit(evt) {
     evt.preventDefault();
@@ -67,6 +73,10 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
     onClose();
   }
 
+  const shouldShowError = (fieldName) => {
+    return isOpen && (touched[fieldName] || isSubmitted) && errors[fieldName];
+  };
+
   return (
     <ModalWithForm
       title="Sign Up"
@@ -92,12 +102,10 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           name="email"
           ref={emailRef}
           autoComplete="email"
-          aria-invalid={isSubmitted && !!errors.email}
+          aria-invalid={shouldShowError("email")}
           aria-describedby="login-error-email"
           className={`modal__input ${
-            (touched.email || isSubmitted) && errors.email
-              ? "modal__input_invalid"
-              : ""
+            shouldShowError("email") ? "moda__input_invalid" : ""
           }`}
           id="register-email"
           placeholder="Enter your email"
@@ -109,12 +117,10 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           id="login-error-email"
           role="alert"
           className={`modal__error ${
-            (touched.email || isSubmitted) && errors.email
-              ? "modal__error_visible"
-              : ""
+            shouldShowError("email") ? "modal__error_visible" : ""
           }`}
         >
-          {errors.email}
+          {isOpen && errors.email}
         </span>
       </label>
       <label htmlFor="register-password" className="modal__label">
@@ -124,12 +130,10 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           type="password"
           ref={passwordRef}
           autoComplete="new-password"
-          aria-invalid={isSubmitted && !!errors.password}
+          aria-invalid={shouldShowError("password")}
           aria-describedby="register-error-password"
           className={`modal__input ${
-            (touched.password || isSubmitted) && errors.password
-              ? "modal__input_invalid"
-              : ""
+            shouldShowError("password") ? "modal__input_invalid" : ""
           }`}
           id="register-password"
           placeholder="Create a password"
@@ -141,12 +145,10 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           id="register-error-password"
           role="alert"
           className={`modal__error ${
-            (touched.password || isSubmitted) && errors.password
-              ? "modal__error_visible"
-              : ""
+            shouldShowError("password") ? "modal__error_visible" : ""
           }`}
         >
-          {errors.password}
+          {isOpen && errors.password}
         </span>
       </label>
       <label htmlFor="register-name" className="modal__label">
@@ -156,12 +158,10 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           name="name"
           ref={nameRef}
           autoComplete="name"
-          aria-invalid={isSubmitted && !!errors.name}
+          aria-invalid={shouldShowError("name")}
           aria-describedby="register-error-name"
           className={`modal__input ${
-            (touched.name || isSubmitted) && errors.name
-              ? "modal__input_invalid"
-              : ""
+            shouldShowError("name") ? "modal__input_invalid" : ""
           }`}
           id="register-name"
           placeholder="Enter your name"
@@ -173,12 +173,10 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           id="register-error-name"
           role="alert"
           className={`modal__error ${
-            (touched.name || isSubmitted) && errors.name
-              ? "modal__error_visible"
-              : ""
+            shouldShowError("name") ? "modal__error_visible" : ""
           }`}
         >
-          {errors.name}
+          {isOpen && errors.name}
         </span>
       </label>
       <label htmlFor="avatarURL" className="modal__label">
@@ -188,12 +186,10 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           type="url"
           ref={avatarURLRef}
           autoComplete="off"
-          aria-invalid={isSubmitted && !!errors.avatarURL}
+          aria-invalid={shouldShowError("avatarURL")}
           aria-describedby="register-error-avatarURL"
           className={`modal__input ${
-            (touched.avatarURL || isSubmitted) && errors.avatarURL
-              ? "modal__input_invalid"
-              : ""
+            shouldShowError("avatarURL") ? "modal__input_invalid" : ""
           }`}
           id="avatarURL"
           placeholder="Image URL"
@@ -205,12 +201,10 @@ const RegisterModal = ({ isOpen, onRegister, onClose, onSwitchToLogin }) => {
           id="register-error-avatarURL"
           role="alert"
           className={`modal__error ${
-            (touched.avatarURL || isSubmitted) && errors.avatarURL
-              ? "modal__error_visible"
-              : ""
+            shouldShowError("avatarURL") ? "modal__error_visible" : ""
           }`}
         >
-          {errors.avatarURL}
+          {isOpen && errors.avatarURL}
         </span>
       </label>
     </ModalWithForm>

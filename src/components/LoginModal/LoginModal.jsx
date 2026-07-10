@@ -1,6 +1,6 @@
 import { useFormWithValidation } from "../../hooks/useFormWithValidation";
 import ModalWithForm from "../ModalWithForm/ModalWithForm";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 
 const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
   const defaultValues = {
@@ -27,6 +27,12 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
+  useEffect(() => {
+    if (!isOpen) {
+      resetForm();
+    }
+  }, [isOpen, resetForm]);
+
   function handleSubmit(evt) {
     evt.preventDefault();
     const { valid, errors: nextErrors } = validateForm();
@@ -36,7 +42,6 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
       return;
     }
 
-    // focus the first invalid field in order: email, password
     if (nextErrors.email) {
       emailRef.current?.focus();
       return;
@@ -50,6 +55,11 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
     resetForm();
     onClose();
   }
+
+  const shouldShowError = (fieldName) => {
+    return isOpen && (touched[fieldName] || isSubmitted) && errors[fieldName];
+  };
+
   return (
     <ModalWithForm
       title="Sign In"
@@ -75,12 +85,10 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
           name="email"
           ref={emailRef}
           autoComplete="email"
-          aria-invalid={isSubmitted && !!errors.email}
+          aria-invalid={shouldShowError("email")}
           aria-describedby="login-error-email"
           className={`modal__input ${
-            (touched.email || isSubmitted) && errors.email
-              ? "modal__input_invalid"
-              : ""
+            shouldShowError("email") ? "modal__input_invalid" : ""
           }`}
           id="login-email"
           placeholder="Enter your email"
@@ -92,12 +100,10 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
           id="login-error-email"
           role="alert"
           className={`modal__error ${
-            (touched.email || isSubmitted) && errors.email
-              ? "modal__error_visible"
-              : ""
+            shouldShowError("email") ? "modal__error_visible" : ""
           }`}
         >
-          {errors.email}
+          {isOpen && errors.email}
         </span>
       </label>
       <label htmlFor="login-password" className="modal__label">
@@ -107,12 +113,10 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
           type="password"
           ref={passwordRef}
           autoComplete="password"
-          aria-invalid={isSubmitted && !!errors.password}
+          aria-invalid={shouldShowError("password")}
           aria-describedby="login-error-password"
           className={`modal__input ${
-            (touched.password || isSubmitted) && errors.password
-              ? "modal__input_invalid"
-              : ""
+            shouldShowError("password") ? "modal__input_invalid" : ""
           }`}
           id="login-password"
           placeholder="Enter your password"
@@ -124,12 +128,10 @@ const LoginModal = ({ isOpen, onLogin, onClose, onSwitchToRegister }) => {
           id="login-error-password"
           role="alert"
           className={`modal__error ${
-            (touched.password || isSubmitted) && errors.password
-              ? "modal__error_visible"
-              : ""
+            shouldShowError("password") ? "modal__error_visible" : ""
           }`}
         >
-          {errors.password}
+          {isOpen && errors.password}
         </span>
       </label>
     </ModalWithForm>
